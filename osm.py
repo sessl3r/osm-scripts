@@ -13,6 +13,16 @@ def base_xml():
     return et
 
 
+def et_fromstring(data: str):
+    return ElementTree.ElementTree(
+            ElementTree.fromstring(data)
+    )
+
+
+def et_tostring(et: ElementTree):
+    return ElementTree.tostring(et.getroot(), encoding='unicode')
+
+
 def argparse_or_env(parser: argparse.ArgumentParser):
     """ Add needed OSM information either from environment or
         from arguments
@@ -24,6 +34,7 @@ def argparse_or_env(parser: argparse.ArgumentParser):
         )
     parser.add_argument('--osmapi', **env_or_required('OSM_API'))
     parser.add_argument('--osmtoken', **env_or_required('OSM_TOKEN'))
+
 
 class OSMApi():
     def __init__(self, url, token):

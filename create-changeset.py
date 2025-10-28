@@ -3,7 +3,6 @@
 import argparse
 import os
 import sys
-import requests
 from xml.etree import ElementTree
 
 import osm
@@ -39,11 +38,13 @@ def main(args: argparse.Namespace):
         tag.set('k', 'comment')
         tag.set('v', args.comment)
 
-    print("The following XML will be sent to OSM:")
+    xmlstr = osm.et_tostring(et)
+    print(f"The following XML will be sent to OSM: {xmlstr}")
     et.write(sys.stdout.buffer, encoding='utf-8', xml_declaration=True)
     q = input("\n\nProceed? (y/n)")
     if (q.lower() != 'y'):
         print("Aborting, bye")
+        return
 
     response = api.put("changeset/create",
             data = ElementTree.tostring(xmlosm, encoding='utf-8'),
