@@ -13,6 +13,20 @@ def base_xml():
     return et
 
 
+def add_xml_tag(et: ElementTree, key: str, value: str, replace = False):
+    root = et.getroot()
+    node = root[0]
+    for tag in node:
+        if key == tag.attrib['k']:
+            if not replace:
+                print(f"tag {key} already set to value {value}, use --force to overwrite")
+                return
+            tag.attrib['v'] = value
+            return
+    node.append(ElementTree.Element('tag', {'k':key,'v':value}))
+    return et
+
+
 def et_fromstring(data: str):
     return ElementTree.ElementTree(
             ElementTree.fromstring(data)
@@ -28,10 +42,7 @@ def argparse_or_env(parser: argparse.ArgumentParser):
         from arguments
     """
     def env_or_required(key):
-        return (
-            {'default': os.environ.get(key)} if os.environ.get(key)
-            else {'required': True}
-        )
+        return ({'default': os.environ.get(key)} if os.environ.get(key) else {'required': True} )
     parser.add_argument('--osmapi', **env_or_required('OSM_API'))
     parser.add_argument('--osmtoken', **env_or_required('OSM_TOKEN'))
 
@@ -58,8 +69,9 @@ class OSMApi():
         )
         return response
     
-    def post(self, endpoint: str, params = None):
+    def post(self, endpoint: str, params = None, data = None):
         response = requests.post(f"{self.url}/{endpoint}",
+                params = params,
                 data = data,
                 headers = {
                     "Authorization": f"Bearer {self.token}"

@@ -12,20 +12,9 @@ def parse_args():
     parser = argparse.ArgumentParser()
     osm.argparse_or_env(parser)
     parser.add_argument('--comment', type=str)
+    parser.add_argument('--close', type=str)
     return parser.parse_args()
 
-def add_tag(xml: str, key: str, value: str, force = False):
-    et = ElementTree.fromstring(xml)
-    if len(et) != 1:
-        raise ExecutionError("ERROR: invalid xml received from OSM, aborting")
-    node = et[0]
-    for tag in node:
-        if key == tag.attrib['k'] and not force:
-            print(f"tag {key} already set to value {value}, use --force to overwrite")
-            return
-    node.append(ElementTree.Element('tag', {'k':key,'v':value}))
-
-    return ElementTree.tostring(et, encoding='utf-8')
 
 def main(args: argparse.Namespace):
     api = osm.OSMApi(args.osmapi, args.osmtoken)
@@ -33,19 +22,17 @@ def main(args: argparse.Namespace):
     xmlosm = et.getroot()
     changset = ElementTree.SubElement(xmlosm, 'changeset')
 
+    if args.close:
+        response = api.put(f"changeset/{args.close}/close")
+        print(response.text)
+        return
+
     if args.comment:
         tag = ElementTree.SubElement(changset, 'tag')
         tag.set('k', 'comment')
         tag.set('v', args.comment)
 
     xmlstr = osm.et_tostring(et)
-    print(f"The following XML will be sent to OSM: {xmlstr}")
-    et.write(sys.stdout.buffer, encoding='utf-8', xml_declaration=True)
-    q = input("\n\nProceed? (y/n)")
-    if (q.lower() != 'y'):
-        print("Aborting, bye")
-        return
-
     response = api.put("changeset/create",
             data = ElementTree.tostring(xmlosm, encoding='utf-8'),
     )
