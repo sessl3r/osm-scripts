@@ -1,11 +1,13 @@
+""" basic wrapper functions for osm api communication """
+
 import argparse
 import os
-import sys
 import requests
 from xml.etree import ElementTree
 
 
 def base_xml():
+    """ create basic xml document """
     osm = ElementTree.Element('osm')
     et = ElementTree.ElementTree(osm)
     osm.set('version', '0.6')
@@ -13,17 +15,18 @@ def base_xml():
     return et
 
 
-def add_xml_tag(et: ElementTree, key: str, value: str, replace = False):
+def add_xml_tag(et: ElementTree, key: str, value: str, replace = False) -> ElementTree:
+    """ add a osm tag to a xml document """
     root = et.getroot()
     node = root[0]
     for tag in node:
         if key == tag.attrib['k']:
             if not replace:
                 print(f"tag {key} already set to value {value}, use --force to overwrite")
-                return
+                break
             tag.attrib['v'] = value
-            return
-    node.append(ElementTree.Element('tag', {'k':key,'v':value}))
+            node.append(ElementTree.Element('tag', {'k':key,'v':value}))
+            break
     return et
 
 
@@ -48,31 +51,35 @@ def argparse_or_env(parser: argparse.ArgumentParser):
 
 
 class OSMApi():
+    """ wrapper for basic http requests to osm api """
     def __init__(self, url, token):
         self.url = url
         self.token = token
 
-    def get(self, endpoint: str, params = None):
+    def get(self, endpoint: str, params = None, data = None):
         response = requests.get(f"{self.url}/{endpoint}",
+                data = data,
+                params = params,
                 headers = {
                     "Authorization": f"Bearer {self.token}"
                 }
         )
         return response
-    
+
     def put(self, endpoint: str, params = None, data = None):
         response = requests.put(f"{self.url}/{endpoint}",
                 data = data,
+                params = params,
                 headers = {
                     "Authorization": f"Bearer {self.token}"
                 }
         )
         return response
-    
+
     def post(self, endpoint: str, params = None, data = None):
         response = requests.post(f"{self.url}/{endpoint}",
-                params = params,
                 data = data,
+                params = params,
                 headers = {
                     "Authorization": f"Bearer {self.token}"
                 }
