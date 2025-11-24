@@ -1,0 +1,2 @@
+ExifRead==3.5.1
+mapillary_tools==0.14.4
