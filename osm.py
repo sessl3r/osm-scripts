@@ -40,6 +40,15 @@ def et_tostring(et: ElementTree):
     return ElementTree.tostring(et.getroot(), encoding='unicode')
 
 
+def et_node_to_dict(node):
+    ret = {}
+    ret['lat'] = node.attrib['lat']
+    ret['lon'] = node.attrib['lon']
+    for tag in node:
+        ret[tag.attrib['k']] = tag.attrib['v']
+    return ret
+
+
 def argparse_or_env(parser: argparse.ArgumentParser):
     """ Add needed OSM information either from environment or
         from arguments
