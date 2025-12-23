@@ -43,16 +43,16 @@ def main(args: argparse.Namespace):
     osm.add_xml_tag(et, 'leaf_cycle', 'deciduous')
 
     if args.species:
-        osm.add_xml_tag(et, 'species:de', args.species) 
+        osm.add_xml_tag(et, 'species:de', args.species)
         if args.species == 'Apfel':
-            osm.add_xml_tag(et, 'species', "Malus") 
-            osm.add_xml_tag(et, 'species:wikidata', "Q104819") 
+            osm.add_xml_tag(et, 'species', "Malus")
+            osm.add_xml_tag(et, 'species:wikidata', "Q104819")
         elif args.species == 'Birne':
-            osm.add_xml_tag(et, 'species', "Pyrus") 
-            osm.add_xml_tag(et, 'species:wikidata', "Q434") 
+            osm.add_xml_tag(et, 'species', "Pyrus")
+            osm.add_xml_tag(et, 'species:wikidata', "Q434")
         elif args.species == 'Pflaume':
-            osm.add_xml_tag(et, 'species', "Prunus domestica") 
-            osm.add_xml_tag(et, 'species:wikidata', "Q44120") 
+            osm.add_xml_tag(et, 'species', "Prunus domestica")
+            osm.add_xml_tag(et, 'species:wikidata', "Q44120")
 
     if args.name:
         osm.add_xml_tag(et, 'taxon', args.name)
